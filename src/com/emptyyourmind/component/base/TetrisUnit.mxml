@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Button 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	cornerRadius="0" 
+	borderColor="#827F7F" 
+	width="{initWidth}" 
+	height="{initHeight}" 
+	fillAlphas="[1.0, 1.0, 1.0, 1.0]" 
+	fillColors="[#827F7F, #827F7F]" 
+	themeColor="#827F7F"
+	>
+	<mx:Script>
+		<![CDATA[
+			import com.emptyyourmind.component.TetrisConst;
+			private var _width:int = TetrisConst.UNIT_OF_MOVEMENT;
+			private var _height:int = TetrisConst.UNIT_OF_MOVEMENT;
+			
+			[Bindable]
+			public function set initWidth(width:int):void
+			{
+				_width = width;
+			}
+			
+			public function get initWidth():int
+			{
+				return _width;
+			}
+			
+			[Bindable]
+			public function set initHeight(height:int):void
+			{
+				_height = height;
+			}
+			
+			public function get initHeight():int
+			{
+				return _height;
+			}
+		]]>
+	</mx:Script>
+</mx:Button>

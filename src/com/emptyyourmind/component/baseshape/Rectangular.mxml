@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="{initWidth}" 
+	height="{initHeight}" 
+	xmlns:base="com.emptyyourmind.component.base.*"
+	implements="com.emptyyourmind.component.ITetris"
+	>
+	<mx:Script>
+		<![CDATA[
+			import com.emptyyourmind.common.TetrisUtil;
+			import com.emptyyourmind.component.base.TetrisUnit;
+			import mx.controls.Alert;
+		
+			private var _initWidth:int = 50;
+			private var _initHeight:int = 50;
+
+			[Bindable]
+			public function set initWidth(width:int):void
+			{
+				_initWidth = width; 
+			}
+						
+			public function get initWidth():int
+			{
+				return _initWidth;
+			}
+			
+			[Bindable]
+			public function set initHeight(height:int):void
+			{
+				_initHeight = height;	
+			}
+			
+			public function get initHeight():int
+			{
+				return _initHeight;	
+			}
+			public function mirrorMyself():void{}
+			
+			public function rotateMyself():void{}
+			
+			public function moveLeft():void
+			{
+				TetrisUtil.moveLeft(this);
+			}
+			
+			public function moveRight():void
+			{
+				TetrisUtil.moveRight(this);
+			}
+			
+			public function moveDown():void
+			{
+				TetrisUtil.moveDown(this);
+			}
+				
+		]]>
+		
+	</mx:Script>
+	<base:TetrisUnit x="0" y="0"/>
+	<base:TetrisUnit x="25" y="0"/>
+	<base:TetrisUnit x="25" y="25"/>
+	<base:TetrisUnit x="0" y="25"/>
+</mx:Canvas>

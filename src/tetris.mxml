@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	xmlns:comps="com.emptyyourmind.component.base.*"
+	creationComplete="init()" 
+	xmlns:base="com.emptyyourmind.component.baseshape.*">
+	<mx:Script>
+		<![CDATA[			
+			import com.emptyyourmind.common.TetrisUtil;
+			import com.emptyyourmind.component.TetrisConst;
+			import com.emptyyourmind.component.baseshape.Rectangular;
+			import mx.controls.Alert;
+			import com.emptyyourmind.component.baseshape.LStick;
+			import com.emptyyourmind.component.baseshape.TStick;
+			import com.emptyyourmind.component.baseshape.Stick;
+			import mx.core.UIComponent;
+			import com.emptyyourmind.component.baseshape.NStick;
+			import com.emptyyourmind.component.ITetris;
+			import com.emptyyourmind.component.base.TetrisUnit;
+			
+			private var iTetris:ITetris;
+			private var uiComponent:UIComponent;
+			private var boardMesh:Array = new Array();
+			private var keyCode:int;
+
+			private function init():void
+			{				
+				iTetris = TetrisUtil.getElement();
+				initComponent();
+				for(var i:int=0; i<20; i++)
+				{
+					var row:Array = new Array();
+					for(var j:int=0; j<10; j++)
+					{
+						row[j] = "s";
+					}
+					boardMesh[i] = row;
+				}
+				application.addEventListener(KeyboardEvent.KEY_DOWN,moveTetrisComponent);
+				var moveDownwardTimer:Timer = new Timer(1000);
+				moveDownwardTimer.addEventListener(TimerEvent.TIMER, autoMoveElement);
+				moveDownwardTimer.start();
+			}
+			
+			private function autoMoveElement(event:TimerEvent):void
+			{
+				if(uiComponent.y + uiComponent.height == TetrisConst.UNIT_OF_MOVEMENT * TetrisConst.ROWS)
+				{
+					fade.play();
+					finalizeMovement(uiComponent as Canvas);
+					iTetris = TetrisUtil.getElement();
+					initComponent();
+				}
+				else
+				{
+					iTetris.moveDown();
+				}
+			}
+			
+			private function initComponent():void
+			{						
+				uiComponent = iTetris as UIComponent;	
+				uiComponent.x = TetrisConst.UNIT_OF_MOVEMENT * 4;
+				if(uiComponent.height == TetrisConst.UNIT_OF_MOVEMENT * 2)
+				{
+					uiComponent.y = -TetrisConst.UNIT_OF_MOVEMENT * 2;
+				}
+				else
+				{
+					uiComponent.y = -TetrisConst.UNIT_OF_MOVEMENT;
+				}
+				uiComponent.setFocus();
+				glow.target = uiComponent;				
+				glow.play();
+				fade.target = uiComponent;
+				board.addChild(uiComponent);
+			}
+			
+			private function moveTetrisComponent(event:KeyboardEvent): void
+			{
+				keyCode = event.keyCode;		
+				if(keyCode == Keyboard.LEFT)
+				{
+					iTetris.moveLeft();					
+				}
+				else if(keyCode == Keyboard.UP)
+				{
+					iTetris.rotateMyself();					
+				}				
+				else if(keyCode == Keyboard.RIGHT)
+				{
+					iTetris.moveRight();				
+				}
+				else if(keyCode == Keyboard.DOWN)
+				{
+					iTetris.moveDown();
+				}
+			}			
+			
+			private function isTheCubeOccupied(xCor:int, yCor:int):Boolean
+			{
+			    var positions:Array = getPositionOnBoard(xCor, yCor);
+				return boardMesh[positions[0]][positions[1]] != null;
+			}
+			
+			private function getPositionOnBoard(xCor:int, yCor:int):Array
+			{
+				var position:Array = new Array();
+				position[0] = yCor/TetrisConst.UNIT_OF_MOVEMENT;
+				position[1] = xCor/TetrisConst.UNIT_OF_MOVEMENT;
+				return position;
+			}
+			
+			private function getPositionWithinCanvas(tetrisUnit:TetrisUnit):Array
+			{
+				var positions:Array = new Array();
+				var newX:int = tetrisUnit.x / TetrisConst.UNIT_OF_MOVEMENT - 1;
+				var newY:int = tetrisUnit.y / TetrisConst.UNIT_OF_MOVEMENT - 1;
+				positions[0] = (newX == -1)?0:newX;
+				positions[1] = (newY == -1)?0:newY;
+				return positions;
+			}
+			
+			private function finalizeMovement(component:Canvas):void
+			{
+				var children:Array = component.getChildren();
+				var positionOfOrigin:Array = getPositionOnBoard(component.x, component.y);				
+				for(var tetrisUnitKey:String in children)
+				{
+					var tetrisUnit:TetrisUnit = children[tetrisUnitKey] as TetrisUnit;
+					var positionOfCurrentUnit:Array = getPositionWithinCanvas(tetrisUnit);
+					tetrisUnit.x = 100;
+					tetrisUnit.y = 200;
+					var rowNum:int = positionOfOrigin[1] + positionOfCurrentUnit[1];
+					var colNum:int = positionOfOrigin[0] + positionOfCurrentUnit[0];
+					var temp:Array = boardMesh[rowNum] as Array;
+					temp[colNum] = tetrisUnit;
+				}
+				board.removeChild(uiComponent);
+			}
+									
+		]]>
+	</mx:Script>
+	<mx:Sequence id="glow">
+		<mx:Glow
+			duration="750"
+			alphaFrom="1.0" alphaTo="0.3"
+			blurXFrom="0.0" blurXTo="10.0"
+			blurYFrom="0.0" blurYTo="10.0"
+			color="0x1b99f1"
+		/>
+		<mx:Glow
+			duration="750"
+			alphaTo="1.0" alphaFrom="0.3"
+			blurXTo="0.0" blurXFrom="10.0"
+			blurYTo="0.0" blurYFrom="10.0"
+			color="0x1b99f1"
+		/>
+	</mx:Sequence>
+	<mx:Sequence id="fade">
+		<mx:Fade alphaFrom="1.0" alphaTo="0.6" duration="250"/>
+		<mx:Fade alphaFrom="0.6" alphaTo="1.0" duration="250"/>
+	</mx:Sequence>
+	<mx:HBox width="440" height="512" verticalCenter="0" horizontalCenter="0" borderStyle="solid" borderColor="#203D46" borderThickness="5" themeColor="#F1A31B">
+		<mx:Canvas width="252" height="502" borderStyle="solid" borderThickness="1" id="board" backgroundColor="#BFC3C5" borderColor="#10161B">
+		</mx:Canvas>
+	</mx:HBox>
+</mx:Application>

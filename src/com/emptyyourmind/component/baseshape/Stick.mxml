@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="{initWidth}"
+	height="{initHeight}" 
+	xmlns:base="com.emptyyourmind.component.base.*"
+	implements="com.emptyyourmind.component.ITetris">
+	<mx:Script>
+		<![CDATA[
+			import com.emptyyourmind.common.TetrisUtil;
+			import com.emptyyourmind.component.TetrisConst;
+			
+			private var phase:int = 0;
+			
+			private var _initWidth:int = 100;
+			private var _initHeight:int = 25;
+			
+			[Bindable]
+			public function set initWidth(width:int):void
+			{
+				_initWidth = width; 
+			}
+						
+			public function get initWidth():int
+			{
+				return _initWidth;
+			}
+			
+			[Bindable]
+			public function set initHeight(height:int):void
+			{
+				_initHeight = height;	
+			}
+			
+			public function get initHeight():int
+			{
+				return _initHeight;	
+			}
+			
+			public function moveLeft():void
+			{
+				TetrisUtil.moveLeft(this);
+			}
+			
+			public function moveRight():void
+			{
+				TetrisUtil.moveRight(this);	
+			}
+			
+			public function moveDown():void
+			{
+				TetrisUtil.moveDown(this);	
+			}
+			
+			public function mirrorMyself():void{}
+			
+			public function rotateMyself():void
+			{
+				removeAllChildren();
+				TetrisUtil.swapDimension(this);
+				fill(phase == 0);
+				if(phase == 0)
+				{
+					x = x + TetrisConst.UNIT_OF_MOVEMENT * 2;
+					y = y - TetrisConst.UNIT_OF_MOVEMENT;
+				}
+				else
+				{
+					x = x - TetrisConst.UNIT_OF_MOVEMENT * 2;
+					y = y + TetrisConst.UNIT_OF_MOVEMENT;
+				}
+				phase = (phase + 1) % 2;
+			}
+			
+			private function fill(isVerticalFill:Boolean):void
+			{
+				for(var i:int=0; i<4; i++)
+				{
+					var tetrisUnit:TetrisUnit = new TetrisUnit();
+					if(isVerticalFill)
+					{
+						tetrisUnit.x = 0;
+						tetrisUnit.y = TetrisConst.UNIT_OF_MOVEMENT * i;
+					}
+					else
+					{
+						tetrisUnit.x = TetrisConst.UNIT_OF_MOVEMENT * i;
+						tetrisUnit.y = 0;
+					}
+					addChild(tetrisUnit);
+				}
+			}				
+		]]>
+	</mx:Script>
+	<base:TetrisUnit x="0" y="0"/>
+	<base:TetrisUnit x="25" y="0"/>
+	<base:TetrisUnit x="50" y="0"/>
+	<base:TetrisUnit x="75" y="0"/>	
+</mx:Canvas>
